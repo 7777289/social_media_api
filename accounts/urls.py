@@ -1,16 +1,20 @@
+# accounts/urls.py (within the file)
+
 from django.urls import path
 from .views import (
-    UserRegistrationView, 
-    UserLoginView, 
-    UserProfileView, 
-    UserLogoutView
+    UserRegistrationView,
+    UserLoginView,
+    UserLogoutView,
+    UserProfileView,
+    FollowToggleView,
+    UserProfileDetailView  # Add this import
 )
-from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
     path('profile/', UserProfileView.as_view(), name='profile'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('profile/<str:username>/', UserProfileDetailView.as_view(), name='profile-detail'), # Add this line
+    path('users/<int:pk>/follow/', FollowToggleView.as_view(), name='follow-toggle'),
 ]

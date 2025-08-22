@@ -1,25 +1,28 @@
+# accounts/admin.py
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from .models import User, UserFollow
 
 class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    list_display = ('username', 'email', 'is_staff', 'is_active', 'created_at')
-    list_filter = ('is_staff', 'is_active', 'created_at')
-    fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
-        ('Personal Info', {'fields': ('bio', 'profile_picture', 'followers')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
+    fieldsets = UserAdmin.fieldsets + (
+        (None, {'fields': ('bio', 'profile_picture')}),
     )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'password1', 'password2', 'is_staff', 'is_active')}
-        ),
-    )
-    readonly_fields = ('created_at', 'updated_at')
-    search_fields = ('username', 'email')
-    ordering = ('-created_at',)
+    list_display = UserAdmin.list_display + ('bio',)
+    
+    # We will display the counts as read-only fields instead
+    readonly_fields = ['followers_count', 'following_count']
+    
+    def followers_count(self, obj):
+        return obj.followers.count()
+    
+    def following_count(self, obj):
+        return obj.following.count()
 
-admin.site.register(CustomUser, CustomUserAdmin)
+
+class UserFollowAdmin(admin.ModelAdmin):
+    list_display = ('user', 'follower', 'created_at')
+
+
+admin.site.register(User, CustomUserAdmin)
+admin.site.register(UserFollow, UserFollowAdmin)
